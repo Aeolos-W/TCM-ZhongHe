@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.apk
+*.keystore
+android-app/.gradle/
+android-app/app/build/
+android-app/captures/
+android-app/local.properties
+android-app/*.iml
+android-app/.idea/
+apk_repack/

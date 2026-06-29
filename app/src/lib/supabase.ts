@@ -1,0 +1,264 @@
+import { createClient } from '@supabase/supabase-js';
+import type { CommunityPost, CommunityComment, AppUpdate, UserProfile } from '@/types/community';
+
+const SUPABASE_URL = 'https://rlgpgdivsxglzzjiduin.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZ3BnZGl2c3hnbHp6amlkdWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjA0MDQsImV4cCI6MjA5ODEzNjQwNH0.Y5xhQWA5btDuGt86CS59Rj0LGMEeSLpVUpfuOJREmt4';
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { autoRefreshToken: true, persistSession: true },
+});
+
+// ================== Auth API ==================
+
+export async function signUp(email: string, password: string, displayName: string) {
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) throw error;
+  if (data.user) {
+    await supabase.from('user_profiles').insert({ id: data.user.id, display_name: displayName });
+  }
+  return data;
+}
+
+export async function signIn(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+export async function signOut() {
+  await supabase.auth.signOut();
+}
+
+export async function getCurrentUser() {
+  const { data } = await supabase.auth.getUser();
+  return data.user;
+}
+
+// ================== 社区帖子 API ==================
+
+export async function fetchPosts(type?: string): Promise<(CommunityPost & { comment_count?: number })[]> {
+  let q = supabase.from('community_posts').select('*').order('created_at', { ascending: false });
+  if (type && type !== 'all') {
+    q = q.eq('type', type);
+  }
+  const { data, error } = await q;
+  if (error) throw error;
+  const posts = (data || []) as CommunityPost[];
+  // 批量获取评论数
+  if (posts.length > 0) {
+    const postIds = posts.map((p) => p.id);
+    const { data: counts, error: countError } = await supabase
+      .from('community_comments')
+      .select('post_id')
+      .in('post_id', postIds);
+    if (!countError && counts) {
+      const countMap: Record<string, number> = {};
+      (counts as any[]).forEach((c) => {
+        countMap[c.post_id] = (countMap[c.post_id] || 0) + 1;
+      });
+      posts.forEach((p) => {
+        (p as any).comment_count = countMap[p.id] || 0;
+      });
+    }
+  }
+  return posts as (CommunityPost & { comment_count?: number })[];
+}
+
+export async function fetchPostById(id: string): Promise<CommunityPost | null> {
+  const { data, error } = await supabase
+    .from('community_posts')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) throw error;
+  return data as CommunityPost | null;
+}
+
+export async function createPost(post: Omit<CommunityPost, 'id' | 'created_at' | 'updated_at' | 'view_count' | 'like_count' | 'user_id'>): Promise<CommunityPost> {
+  const user = await getCurrentUser();
+  const { data, error } = await supabase
+    .from('community_posts')
+    .insert([{ ...post, user_id: user?.id || null, view_count: 0, like_count: 0 }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data as CommunityPost;
+}
+
+export async function updatePost(id: string, updates: Partial<CommunityPost>): Promise<CommunityPost> {
+  const { data, error } = await supabase
+    .from('community_posts')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as CommunityPost;
+}
+
+export async function incrementViewCount(id: string): Promise<void> {
+  try {
+    await supabase.rpc('increment_post_view', { post_id: id });
+  } catch {
+    // RPC 不存在时回退：读取当前值+1更新
+    const { data } = await supabase.from('community_posts').select('view_count').eq('id', id).single();
+    if (data) {
+      await supabase.from('community_posts').update({ view_count: (data.view_count || 0) + 1 }).eq('id', id);
+    }
+  }
+}
+
+export async function searchPostByTitle(keyword: string): Promise<CommunityPost[]> {
+  const { data, error } = await supabase
+    .from('community_posts')
+    .select('*')
+    .ilike('title', `%${keyword}%`)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (error) throw error;
+  return (data || []) as CommunityPost[];
+}
+
+// ================== 评论 API ==================
+
+export async function fetchComments(postId: string): Promise<CommunityComment[]> {
+  const { data, error } = await supabase
+    .from('community_comments')
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data || []) as CommunityComment[];
+}
+
+export async function createComment(comment: Omit<CommunityComment, 'id' | 'created_at' | 'user_id'>): Promise<CommunityComment> {
+  const user = await getCurrentUser();
+  const { data, error } = await supabase
+    .from('community_comments')
+    .insert([{ ...comment, user_id: user?.id || null }])
+    .select()
+    .single();
+  if (error) throw error;
+  return data as CommunityComment;
+}
+
+// ================== 收藏 API ==================
+
+export async function addFavorite(postId: string): Promise<void> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('请先登录');
+  const { error } = await supabase
+    .from('user_favorites')
+    .insert([{ user_id: user.id, post_id: postId }]);
+  if (error) throw error;
+}
+
+export async function removeFavorite(postId: string): Promise<void> {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('请先登录');
+  const { error } = await supabase
+    .from('user_favorites')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('post_id', postId);
+  if (error) throw error;
+}
+
+export async function fetchFavorites(): Promise<CommunityPost[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { data, error } = await supabase
+    .from('user_favorites')
+    .select('post_id')
+    .eq('user_id', user.id);
+  if (error) throw error;
+  const postIds = (data || []).map((d: any) => d.post_id);
+  if (postIds.length === 0) return [];
+  const { data: posts, error: postsError } = await supabase
+    .from('community_posts')
+    .select('*')
+    .in('id', postIds);
+  if (postsError) throw postsError;
+  return (posts || []) as CommunityPost[];
+}
+
+export async function checkFavorite(postId: string): Promise<boolean> {
+  const user = await getCurrentUser();
+  if (!user) return false;
+  const { data, error } = await supabase
+    .from('user_favorites')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('post_id', postId)
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
+// ================== 热更新 API ==================
+
+export async function fetchLatestUpdate(currentVersionCode: number): Promise<AppUpdate | null> {
+  const { data, error } = await supabase
+    .from('app_updates')
+    .select('*')
+    .gt('version_code', currentVersionCode)
+    .order('version_code', { ascending: false })
+    .limit(1)
+    .single();
+  if (error && error.code !== 'PGRST116') throw error;
+  return data as AppUpdate | null;
+}
+
+// ================== 用户相关 ==================
+
+export async function ensureUserProfile(userId: string, displayName: string): Promise<void> {
+  const { error } = await supabase
+    .from('user_profiles')
+    .upsert({ id: userId, display_name: displayName, created_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
+export async function fetchUserProfile(userId: string): Promise<UserProfile | null> {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  if (error) return null;
+  return data as UserProfile | null;
+}
+
+// ================== 访客/本地用户管理 ==================
+
+const VISITOR_NAME_KEY = 'zhongjing_visitor_name';
+const USERNAME_KEY = 'zhongjing_username';
+
+export function getVisitorName(): string {
+  let name = localStorage.getItem(VISITOR_NAME_KEY);
+  if (!name) {
+    name = '用户' + Math.floor(Math.random() * 10000);
+    localStorage.setItem(VISITOR_NAME_KEY, name);
+  }
+  return name;
+}
+
+export function setVisitorName(name: string): void {
+  localStorage.setItem(VISITOR_NAME_KEY, name);
+}
+
+export function getUsername(): string {
+  return localStorage.getItem(USERNAME_KEY) || getVisitorName();
+}
+
+export function setUsername(name: string): void {
+  localStorage.setItem(USERNAME_KEY, name);
+}
+
+export async function getDisplayName(): Promise<string> {
+  const user = await getCurrentUser();
+  if (user) {
+    const profile = await fetchUserProfile(user.id);
+    return profile?.display_name || getUsername() || user.email || '用户';
+  }
+  return getUsername();
+}

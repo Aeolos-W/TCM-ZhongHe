@@ -1,0 +1,12 @@
+#!/bin/sh
+# Simple gradlew wrapper using locally cached Gradle 8.4 (downloaded via Aliyun mirror)
+GRADLE_HOME="/home/kimi/.gradle/wrapper/dists/gradle-8.4-bin/eeiev1nt7de1hsdq3wo7imonu/gradle-8.4"
+if [ ! -d "$GRADLE_HOME" ]; then
+    echo "Error: Gradle 8.4 not found at $GRADLE_HOME"
+    echo "Downloading from Aliyun mirror..."
+    mkdir -p "$(dirname "$GRADLE_HOME")"
+    wget -q --show-progress "https://mirrors.aliyun.com/gradle/distributions/v8.4.0/gradle-8.4-bin.zip" -O /tmp/gradle-8.4-bin.zip
+    unzip -q /tmp/gradle-8.4-bin.zip -d "$(dirname "$GRADLE_HOME")"
+    rm /tmp/gradle-8.4-bin.zip
+fi
+exec "$GRADLE_HOME/bin/gradle" "$@"
