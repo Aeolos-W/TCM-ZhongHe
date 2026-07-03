@@ -1,57 +1,127 @@
 import { useDataStore } from '@/lib/dataStore';
-import { isWebView } from '@/lib/fileSystemService';
-import { FolderOpen, Stethoscope, BookOpen, Database, Smartphone } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const FIRST_RUN_KEY = 'zhongjing_first_run';
 
+/** Traditional Chinese tower SVG icon */
+function TowerIcon() {
+  return (
+    <svg viewBox="0 0 200 240" className="w-40 h-48 sm:w-48 sm:h-56">
+      {/* Roof layers */}
+      <path d="M100 10 L100 25" stroke="#802008" strokeWidth="2" />
+      <circle cx="100" cy="8" r="3" fill="#c49a3c" />
+      {/* Top roof */}
+      <path d="M100 25 Q70 45 40 55 Q70 50 100 48 Q130 50 160 55 Q130 45 100 25" fill="#802008" />
+      {/* Second roof */}
+      <path d="M100 55 Q75 75 50 85 Q75 80 100 78 Q125 80 150 85 Q125 75 100 55" fill="#802008" />
+      {/* Third roof */}
+      <path d="M100 85 Q80 105 55 115 Q80 110 100 108 Q120 110 145 115 Q120 105 100 85" fill="#802008" />
+      {/* Body */}
+      <rect x="75" y="108" width="50" height="60" rx="2" fill="#802008" />
+      {/* Door */}
+      <rect x="88" y="148" width="24" height="20" rx="2" fill="#fdfbf7" />
+      {/* Steps */}
+      <rect x="70" y="168" width="60" height="4" rx="1" fill="#a03520" />
+      <rect x="65" y="174" width="70" height="4" rx="1" fill="#a03520" />
+      <rect x="60" y="180" width="80" height="4" rx="1" fill="#a03520" />
+      {/* "众" character strokes integrated into tower */}
+      <text x="100" y="80" textAnchor="middle" fill="#fdfbf7" fontSize="28" fontFamily="serif" fontWeight="bold">众</text>
+      <text x="100" y="135" textAnchor="middle" fill="#fdfbf7" fontSize="32" fontFamily="serif" fontWeight="bold">合</text>
+    </svg>
+  );
+}
+
+/** Chinese seal stamp */
+function SealStamp() {
+  return (
+    <div className="absolute right-8 top-28 sm:right-16 sm:top-32">
+      <div className="border-2 border-[#802008] rounded-md px-2 py-3 bg-[#fdfbf7]/80">
+        <div className="text-[#802008] text-sm font-bold writing-vertical" style={{ writingMode: 'vertical-rl' }}>中医</div>
+      </div>
+    </div>
+  );
+}
+
+/** Mountain silhouette */
+function MountainLeft() {
+  return (
+    <svg viewBox="0 0 120 80" className="absolute left-0 bottom-32 w-28 h-20 sm:w-36 sm:h-24 opacity-40">
+      <path d="M0 80 L20 35 L40 50 L55 20 L80 45 L100 30 L120 80 Z" fill="#c4b49a" />
+      <path d="M20 35 L25 45 L30 38 L35 48 L40 50" fill="none" stroke="#a09078" strokeWidth="0.5" />
+    </svg>
+  );
+}
+
+function MountainRight() {
+  return (
+    <svg viewBox="0 0 100 70" className="absolute right-0 bottom-32 w-24 h-16 sm:w-32 sm:h-20 opacity-40">
+      <path d="M0 70 L25 25 L45 45 L60 15 L80 35 L100 70 Z" fill="#c4b49a" />
+    </svg>
+  );
+}
+
+/** Cloud decoration */
+function CloudLeft() {
+  return (
+    <svg viewBox="0 0 100 40" className="absolute left-4 top-36 w-20 h-8 sm:w-28 sm:h-10 opacity-30">
+      <path d="M10 30 Q20 10 40 20 Q55 5 75 18 Q90 12 95 25 Q85 35 60 32 Q35 38 10 30" fill="#d4c4a8" />
+    </svg>
+  );
+}
+
+function CloudRight() {
+  return (
+    <svg viewBox="0 0 80 35" className="absolute right-6 top-44 w-16 h-7 sm:w-24 sm:h-9 opacity-30">
+      <path d="M5 25 Q15 8 35 15 Q50 5 70 16 Q78 12 75 22 Q65 30 40 28 Q15 32 5 25" fill="#d4c4a8" />
+    </svg>
+  );
+}
+
 export default function FolderPicker() {
   const { selectFolder } = useDataStore();
-  const inWebView = isWebView();
+  const [fadeOut, setFadeOut] = useState(false);
 
-  function handleStart() {
-    localStorage.setItem(FIRST_RUN_KEY, 'true');
-    selectFolder();
-  }
+  useEffect(() => {
+    const timer1 = setTimeout(() => setFadeOut(true), 2000);
+    const timer2 = setTimeout(() => {
+      localStorage.setItem(FIRST_RUN_KEY, 'true');
+      selectFolder();
+    }, 2500);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [selectFolder]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-[#fdfbf7] text-center px-4">
-      <div className="mb-8">
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <Stethoscope className="w-10 h-10 text-[#802008]" />
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">仲景医案录</h1>
+    <div
+      className={`flex flex-col items-center justify-center h-full w-full relative overflow-hidden transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+      style={{ background: 'linear-gradient(180deg, #f5f0e6 0%, #f8f4ec 50%, #fdfbf7 100%)' }}
+    >
+      {/* Decorative elements */}
+      <CloudLeft />
+      <CloudRight />
+      <MountainLeft />
+      <MountainRight />
+      <SealStamp />
+
+      {/* Main content */}
+      <div className="flex flex-col items-center z-10">
+        {/* Tower icon */}
+        <div className="mb-6">
+          <TowerIcon />
         </div>
-        <p className="text-gray-500 text-base max-w-md leading-relaxed">
-          {inWebView
-            ? '中医医案数据库管理系统。数据将保存在应用私有目录中，安全且便于管理。'
-            : '中医医案数据库管理系统。请选择本地文件夹作为数据存储位置，所有医案数据将以 JSON 格式保存在该文件夹中。'}
+      </div>
+
+      {/* Bottom text */}
+      <div className="absolute bottom-16 sm:bottom-20 flex flex-col items-center z-10">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-[0.3em] text-[#802008] mb-3" style={{ fontFamily: 'serif' }}>
+          众合
+        </h1>
+        <p className="text-sm sm:text-base text-[#802008] tracking-wider" style={{ fontFamily: 'serif' }}>
+          —集众腋之裘，合众家之籍。—
         </p>
       </div>
-
-      <div className="grid grid-cols-3 gap-4 mb-10 max-w-lg">
-        {[
-          { icon: inWebView ? <Smartphone className="w-8 h-8 text-[#802008] mb-2" /> : <Database className="w-8 h-8 text-[#802008] mb-2" />, title: inWebView ? '本地存储' : '本地存储', desc: inWebView ? '应用私有目录' : '数据完全由您掌控' },
-          { icon: <BookOpen className="w-8 h-8 text-[#802008] mb-2" />, title: 'Markdown', desc: '支持 Markdown 录入' },
-          { icon: <Stethoscope className="w-8 h-8 text-[#802008] mb-2" />, title: '结构化', desc: '症状/疾病/病机/病因' },
-        ].map((item) => (
-          <div key={item.title} className="flex flex-col items-center p-4 rounded-lg bg-white border border-gray-200">
-            {item.icon}
-            <span className="text-sm font-medium text-gray-700">{item.title}</span>
-            <span className="text-xs text-gray-400 mt-1">{item.desc}</span>
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={handleStart}
-        className="group flex items-center gap-3 px-8 py-4 bg-[#802008] hover:bg-[#601005] text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-      >
-        <FolderOpen className="w-5 h-5" />
-        <span className="text-base font-medium">{inWebView ? '开始使用' : '选择数据存储文件夹'}</span>
-      </button>
-
-      <p className="mt-4 text-xs text-gray-400">
-        {inWebView ? '首次使用会自动创建数据目录和默认分类' : '首次使用会自动创建配置文件和医案数据目录'}
-      </p>
     </div>
   );
 }
