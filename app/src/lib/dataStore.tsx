@@ -83,8 +83,11 @@ export function DataStoreProvider({ children }: { children: React.ReactNode }) {
       await saveConfig(config);
       dispatch({ type: 'SET_CONFIG', payload: config });
       dispatch({ type: 'SET_RECORDS', payload: records });
-      dispatch({ type: 'SET_FOLDER_SELECTED', payload: true });
-    } finally { dispatch({ type: 'SET_LOADING', payload: false }); }
+    } catch (err) {
+      console.error('[DataStore] selectFolder error:', err);
+    }
+    dispatch({ type: 'SET_FOLDER_SELECTED', payload: true });
+    dispatch({ type: 'SET_LOADING', payload: false });
   }, []);
 
   const refreshRecords = useCallback(async () => {

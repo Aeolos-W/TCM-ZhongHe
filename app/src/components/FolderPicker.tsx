@@ -26,7 +26,7 @@ export default function FolderPicker() {
     >
       {/* Left mountain */}
       <img
-        src="/splash-assets/asset_2_0.png"
+        src="./splash-assets/asset_2_0.png"
         alt=""
         className="absolute left-0 opacity-90"
         style={{ bottom: '38%', width: '35%', maxWidth: '200px' }}
@@ -34,7 +34,7 @@ export default function FolderPicker() {
 
       {/* Left cloud */}
       <img
-        src="/splash-assets/asset_3_0.png"
+        src="./splash-assets/asset_3_0.png"
         alt=""
         className="absolute opacity-80"
         style={{ left: '5%', top: '32%', width: '28%', maxWidth: '160px' }}
@@ -42,7 +42,7 @@ export default function FolderPicker() {
 
       {/* Right mountain */}
       <img
-        src="/splash-assets/asset_4_0.png"
+        src="./splash-assets/asset_4_0.png"
         alt=""
         className="absolute right-0 opacity-90"
         style={{ bottom: '36%', width: '32%', maxWidth: '180px' }}
@@ -58,7 +58,7 @@ export default function FolderPicker() {
 
       {/* Main tower icon - centered */}
       <img
-        src="/splash-assets/asset_1_0.png"
+        src="./splash-assets/asset_1_0.png"
         alt="众合"
         className="absolute"
         style={{
@@ -72,7 +72,7 @@ export default function FolderPicker() {
 
       {/* Seal stamp - top right */}
       <img
-        src="/splash-assets/asset_5_0.png"
+        src="./splash-assets/asset_5_0.png"
         alt="中医"
         className="absolute"
         style={{
