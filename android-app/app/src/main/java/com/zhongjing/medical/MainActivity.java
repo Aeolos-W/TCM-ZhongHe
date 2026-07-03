@@ -363,13 +363,40 @@ public class MainActivity extends AppCompatActivity {
         public void exportData(String jsonContent) {
             new Handler(Looper.getMainLooper()).post(() -> {
                 try {
+                    String fileName = null;
+                    String mimeType = null;
+                    byte[] fileBytes = null;
+
+                    // Try parse JSON metadata from frontend
+                    try {
+                        org.json.JSONObject meta = new org.json.JSONObject(jsonContent);
+                        if (meta.has("filename") && meta.has("content")) {
+                            fileName = meta.getString("filename");
+                            mimeType = meta.optString("mime", "text/plain");
+                            String content = meta.getString("content");
+                            if (meta.optBoolean("base64", false)) {
+                                fileBytes = android.util.Base64.decode(content, android.util.Base64.DEFAULT);
+                            } else {
+                                fileBytes = content.getBytes(StandardCharsets.UTF_8);
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Not a metadata JSON, treat as raw content
+                    }
+
+                    // Fallback to legacy behavior
+                    if (fileName == null) {
+                        fileName = "众合中医_导出_" + System.currentTimeMillis() + ".json";
+                        mimeType = "application/json";
+                        fileBytes = jsonContent.getBytes(StandardCharsets.UTF_8);
+                    }
+
                     // Save to cache dir for sharing
                     File cacheDir = new File(getCacheDir(), "exports");
                     cacheDir.mkdirs();
-                    String fileName = "仲景医案录_导出_" + System.currentTimeMillis() + ".json";
                     File exportFile = new File(cacheDir, fileName);
                     FileOutputStream fos = new FileOutputStream(exportFile);
-                    fos.write(jsonContent.getBytes(StandardCharsets.UTF_8));
+                    fos.write(fileBytes);
                     fos.close();
 
                     // Get content URI via FileProvider
@@ -381,10 +408,9 @@ public class MainActivity extends AppCompatActivity {
 
                     // Create share intent
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("application/json");
+                    shareIntent.setType(mimeType);
                     shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "仲景医案录数据导出");
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, "这是我的中医医案数据库导出文件");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, fileName);
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
