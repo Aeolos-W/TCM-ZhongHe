@@ -297,13 +297,6 @@ export function searchBooks(books: Book[], query: string, bookId?: string): Sear
 
 // ========== Export ==========
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
 /** Build Markdown export — keeps <mark> tags for highlight */
 function buildMarkdown(groups: BookSearchGroup[], query: string, total: number): string {
   const lines = [
@@ -385,9 +378,8 @@ async function buildDocx(groups: BookSearchGroup[], query: string, total: number
   }
 
   children.push(new Paragraph({
-    text: '由 众合中医 导出',
     alignment: AlignmentType.CENTER,
-    color: '999999',
+    children: [new TextRun({ text: '由 众合中医 导出', color: '999999' })],
   }));
 
   const doc = new Document({
@@ -397,6 +389,20 @@ async function buildDocx(groups: BookSearchGroup[], query: string, total: number
   return await Packer.toBlob(doc);
 }
 
+/** Try sharing via Web Share API (supports real filenames in modern WebView) */
+async function tryWebShare(blob: Blob, fileName: string, title: string): Promise<boolean> {
+  try {
+    if (!navigator.share) return false;
+    const file = new File([blob], fileName, { type: blob.type });
+    const shareData: ShareData = { files: [file], title };
+    if (navigator.canShare && !navigator.canShare(shareData)) return false;
+    await navigator.share(shareData);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function exportSearchResults(
   groups: BookSearchGroup[],
   query: string,
@@ -404,9 +410,13 @@ export function exportSearchResults(
   format: 'md' | 'docx' = 'md'
 ): void {
   const fileName = `检索结果_${query}_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.${format}`;
+  const title = `检索结果：${query}`;
 
   if (format === 'docx') {
-    buildDocx(groups, query, total).then((blob) => {
+    buildDocx(groups, query, total).then(async (blob) => {
+      const shared = await tryWebShare(blob, fileName, title);
+      if (shared) return;
+      // Fallback to native bridge (will produce .json filename due to legacy code)
       if (isWebView() && window.AndroidBridge) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -431,21 +441,25 @@ export function exportSearchResults(
 
   const content = buildMarkdown(groups, query, total);
   const mime = 'text/markdown';
+  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
 
-  if (isWebView() && window.AndroidBridge) {
-    const payload = JSON.stringify({ filename: fileName, mime, content });
-    window.AndroidBridge.exportData(payload);
-  } else {
-    const blob = new Blob([content], { type: mime + ';charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
+  tryWebShare(blob, fileName, title).then((shared) => {
+    if (shared) return;
+    // Fallback to native bridge or browser download
+    if (isWebView() && window.AndroidBridge) {
+      const payload = JSON.stringify({ filename: fileName, mime, content });
+      window.AndroidBridge.exportData(payload);
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  });
 }
 
 // ========== Comments ==========

@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Book } from '@/types/book';
 import { searchBooksV2, type BookSearchGroup } from '@/lib/bookService';
 import { exportSearchResults } from '@/lib/bookService';
-import { Search, ArrowLeft, ChevronDown, ChevronUp, Share2, FileText, Code2, X } from 'lucide-react';
+import { Search, ArrowLeft, ChevronDown, ChevronUp, Share2, FileText, X } from 'lucide-react';
 
 interface BookSearchProps {
   books: Book[];
