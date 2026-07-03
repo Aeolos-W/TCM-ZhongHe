@@ -67,6 +67,11 @@
 
 @layer base {
   * { @apply border-border; }
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
