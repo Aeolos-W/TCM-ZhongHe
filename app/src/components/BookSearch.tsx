@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import type { Book } from '@/types/book';
 import { searchBooksV2, type BookSearchGroup } from '@/lib/bookService';
 import { exportSearchResults } from '@/lib/bookService';
-import { Search, ArrowLeft, ChevronDown, ChevronUp, Share2 } from 'lucide-react';
+import { Search, ArrowLeft, ChevronDown, ChevronUp, Share2, FileText, Code2, X } from 'lucide-react';
 
 interface BookSearchProps {
   books: Book[];
@@ -16,6 +16,7 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
   const [searched, setSearched] = useState(!!initialQuery);
   const [collapsedBooks, setCollapsedBooks] = useState<Set<string>>(new Set());
   const [collapsedChapters, setCollapsedChapters] = useState<Set<string>>(new Set());
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Perform search
   const { groups, total } = useMemo(() => {
@@ -60,9 +61,14 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
   };
 
   // Handle export
-  const handleExport = () => {
+  const handleExportClick = () => {
     if (groups.length === 0) return;
-    exportSearchResults(groups, query, total);
+    setShowExportMenu(true);
+  };
+
+  const handleExport = (format: 'md' | 'docx') => {
+    setShowExportMenu(false);
+    exportSearchResults(groups, query, total, format);
   };
 
   // Count books
@@ -99,7 +105,7 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
               {bookCount > 0 && <span> · <span className="text-[#601005] font-bold">{bookCount}</span> 本书</span>}
             </div>
             {total > 0 && (
-              <button onClick={handleExport} className="flex items-center gap-1 text-xs text-[#601005] hover:text-[#400803]">
+              <button onClick={handleExportClick} className="flex items-center gap-1 text-xs text-[#601005] hover:text-[#400803]">
                 <Share2 className="w-3.5 h-3.5" />导出并分享
               </button>
             )}
@@ -213,6 +219,40 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
           background-color: #FFE566;
         }
       `}</style>
+
+      {/* Export format menu */}
+      {showExportMenu && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowExportMenu(false)}>
+          <div className="w-full max-w-sm bg-white rounded-t-2xl p-4 mb-0 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-gray-800">选择导出格式</h3>
+              <button onClick={() => setShowExportMenu(false)} className="p-1 text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => handleExport('md')}>
+                <div className="w-10 h-10 rounded-lg bg-[#fdf2f2] flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-[#802008]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">导出为 Markdown</p>
+                  <p className="text-xs text-gray-500">.md 文件，保留高亮标签</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => handleExport('docx')}>
+                <div className="w-10 h-10 rounded-lg bg-[#fdf2f2] flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-[#802008]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">导出为 Word</p>
+                  <p className="text-xs text-gray-500">.docx 文件，保留高亮渲染</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { Book, BookComment, SearchResult } from '@/types/book';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 
 const BOOKS_DIR = 'books';
 
@@ -295,7 +296,16 @@ export function searchBooks(books: Book[], query: string, bookId?: string): Sear
 }
 
 // ========== Export ==========
-export function exportSearchResults(groups: BookSearchGroup[], query: string, total: number): void {
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/** Build Markdown export — keeps <mark> tags for highlight */
+function buildMarkdown(groups: BookSearchGroup[], query: string, total: number): string {
   const lines = [
     `# 检索结果：${query}`,
     `> 共 ${total} 条结果，${groups.length} 本书`,
@@ -308,21 +318,129 @@ export function exportSearchResults(groups: BookSearchGroup[], query: string, to
       lines.push(`### ${cg.chapterTitle} (${cg.count}段)`);
       for (const s of cg.snippets) {
         const tag = s.category ? `【${s.category}】` : `【节选${s.snippetIndex}】`;
-        lines.push(`${tag} ${s.excerpt.replace(/<[^>]+>/g, '')}`);
+        // Keep <mark> tags so highlights render in viewers that support inline HTML
+        lines.push(`${tag} ${s.excerpt}`);
       }
     }
     lines.push('');
   }
-  const md = lines.join('\n');
+  return lines.join('\n');
+}
+
+/** Build DOCX export — preserves highlights as Word document */
+async function buildDocx(groups: BookSearchGroup[], query: string, total: number): Promise<Blob> {
+  const children: Paragraph[] = [];
+
+  // Header
+  children.push(new Paragraph({
+    text: `检索结果：${query}`,
+    heading: HeadingLevel.HEADING_1,
+    alignment: AlignmentType.CENTER,
+  }));
+  children.push(new Paragraph({
+    text: `共 ${total} 条结果，${groups.length} 本书`,
+    alignment: AlignmentType.CENTER,
+  }));
+  children.push(new Paragraph({
+    text: `导出时间：${new Date().toLocaleString('zh-CN')}`,
+    alignment: AlignmentType.CENTER,
+  }));
+  children.push(new Paragraph({ text: '' }));
+
+  for (const bg of groups) {
+    children.push(new Paragraph({
+      text: `《${bg.bookTitle}》(${bg.count}条)`,
+      heading: HeadingLevel.HEADING_2,
+    }));
+    for (const cg of bg.chapters) {
+      children.push(new Paragraph({
+        text: `${cg.chapterTitle} (${cg.count}段)`,
+        heading: HeadingLevel.HEADING_3,
+      }));
+      for (const s of cg.snippets) {
+        const tag = s.category ? `【${s.category}】` : `【节选${s.snippetIndex}】`;
+        // Convert excerpt with <mark> tags into TextRuns
+        const runs: TextRun[] = [];
+        runs.push(new TextRun({ text: tag + ' ', bold: true, color: '802008' }));
+
+        // Parse excerpt and preserve <mark> highlights
+        const parts = s.excerpt.split(/(<mark[^>]*>.*?<\/mark>)/g);
+        for (const part of parts) {
+          if (part.startsWith('<mark')) {
+            const text = part.replace(/<mark[^>]*>/g, '').replace(/<\/mark>/g, '');
+            runs.push(new TextRun({ text, highlight: 'yellow', bold: true }));
+          } else {
+            // Strip any remaining HTML tags
+            const cleanText = part.replace(/<[^>]+>/g, '');
+            if (cleanText) {
+              runs.push(new TextRun({ text: cleanText }));
+            }
+          }
+        }
+
+        children.push(new Paragraph({ children: runs }));
+      }
+    }
+    children.push(new Paragraph({ text: '' }));
+  }
+
+  children.push(new Paragraph({
+    text: '由 众合中医 导出',
+    alignment: AlignmentType.CENTER,
+    color: '999999',
+  }));
+
+  const doc = new Document({
+    sections: [{ children }],
+  });
+
+  return await Packer.toBlob(doc);
+}
+
+export function exportSearchResults(
+  groups: BookSearchGroup[],
+  query: string,
+  total: number,
+  format: 'md' | 'docx' = 'md'
+): void {
+  const fileName = `检索结果_${query}_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.${format}`;
+
+  if (format === 'docx') {
+    buildDocx(groups, query, total).then((blob) => {
+      if (isWebView() && window.AndroidBridge) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          const payload = JSON.stringify({ filename: fileName, mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', content: base64, base64: true });
+          window.AndroidBridge!.exportData(payload);
+        };
+        reader.readAsDataURL(blob);
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    });
+    return;
+  }
+
+  const content = buildMarkdown(groups, query, total);
+  const mime = 'text/markdown';
 
   if (isWebView() && window.AndroidBridge) {
-    window.AndroidBridge.exportData(md);
+    const payload = JSON.stringify({ filename: fileName, mime, content });
+    window.AndroidBridge.exportData(payload);
   } else {
-    const blob = new Blob([md], { type: 'text/markdown' });
+    const blob = new Blob([content], { type: mime + ';charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `检索结果_${query}_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.md`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
