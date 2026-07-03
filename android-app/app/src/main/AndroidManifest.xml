@@ -12,7 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="仲景医案录"
+        android:label="众合中医"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"

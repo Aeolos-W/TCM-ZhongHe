@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Book } from '@/types/book';
-import { loadBooks, importBookFromFile, deleteBook } from '@/lib/bookService';
+import { loadBooks, importBookFromFile, deleteBook, saveBook } from '@/lib/bookService';
 import { isWebView } from '@/lib/fileSystemService';
 import { Search, Upload, Trash2, BookOpen, ArrowLeft, Download, FolderPlus } from 'lucide-react';
 
@@ -8,6 +8,7 @@ import { Search, Upload, Trash2, BookOpen, ArrowLeft, Download, FolderPlus } fro
 declare global {
   interface Window {
     onBookImportComplete?: (fileName: string, content: string) => void;
+    onImportComplete?: (jsonContent: string) => void;
   }
 }
 
@@ -132,6 +133,34 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
   // WebView: batch import via native bridge
   const handleBatchImportClick = () => {
     if (isWebView()) {
+      // Handle JSON book array / single book object (imported as medical-record JSON by native)
+      window.onImportComplete = async (jsonContent: string) => {
+        try {
+          const data = JSON.parse(jsonContent);
+          let count = 0;
+          if (Array.isArray(data)) {
+            for (const item of data) {
+              if (item.id && item.title && typeof item.content === 'string') {
+                await saveBook(item as Book);
+                count++;
+              }
+            }
+          } else if (data.id && data.title && typeof data.content === 'string') {
+            await saveBook(data as Book);
+            count = 1;
+          }
+          await refresh();
+          if (count > 0) {
+            window.AndroidBridge?.showToast(`成功导入 ${count} 本书籍`);
+          } else {
+            window.AndroidBridge?.showToast('导入失败：未识别到有效的书籍数据');
+          }
+        } catch (err: any) {
+          window.AndroidBridge?.showToast('导入失败：' + (err.message || '格式错误'));
+        }
+        window.onImportComplete = undefined;
+      };
+      // Handle plain text / markdown files
       window.onBookImportComplete = async (fileName: string, content: string) => {
         try {
           const { importBookFromText } = await import('@/lib/bookService');
@@ -152,7 +181,7 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
     } else {
       batchFileInputRef.current?.click();
     }
-  };
+      };
 
   const handleDelete = async (id: string, title: string) => {
     if (!window.confirm(`确定删除《${title}》？`)) return;
