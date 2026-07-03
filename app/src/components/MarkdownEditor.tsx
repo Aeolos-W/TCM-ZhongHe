@@ -147,7 +147,7 @@ export default function MarkdownEditor({ value, onChange, onSave, enableExtended
                 <Type className="w-3.5 h-3.5 text-gray-400 ml-1" />
                 <select
                   onChange={(e) => { insertSize(e.target.value); e.target.value = ''; }}
-                  className="text-xs bg-white border border-gray-200 rounded px-1 py-1 text-gray-600 outline-none focus:border-amber-400"
+                  className="text-xs bg-white border border-gray-200 rounded px-1 py-1 text-gray-600 outline-none focus:border-[#c94d4d]"
                   defaultValue=""
                 >
                   <option value="" disabled>字号</option>
@@ -164,7 +164,7 @@ export default function MarkdownEditor({ value, onChange, onSave, enableExtended
                 <Palette className="w-3.5 h-3.5 text-gray-400 ml-1" />
                 <select
                   onChange={(e) => { insertColor(e.target.value); e.target.value = ''; }}
-                  className="text-xs bg-white border border-gray-200 rounded px-1 py-1 text-gray-600 outline-none focus:border-amber-400"
+                  className="text-xs bg-white border border-gray-200 rounded px-1 py-1 text-gray-600 outline-none focus:border-[#c94d4d]"
                   defaultValue=""
                 >
                   <option value="" disabled>颜色</option>
@@ -180,13 +180,13 @@ export default function MarkdownEditor({ value, onChange, onSave, enableExtended
                 </select>
               </div>
               {/* 帖子引用 */}
-              <button onClick={() => setShowTitleSearch(true)} title="按标题引用帖子" className="p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded shrink-0"><Search className="w-4 h-4" /></button>
-              <button onClick={insertPostRef} title="输入UUID引用帖子" className="p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded shrink-0"><Link2 className="w-4 h-4" /></button>
+              <button onClick={() => setShowTitleSearch(true)} title="按标题引用帖子" className="p-1.5 text-[#802008] hover:text-[#601005] hover:bg-[#fdf2f2] rounded shrink-0"><Search className="w-4 h-4" /></button>
+              <button onClick={insertPostRef} title="输入UUID引用帖子" className="p-1.5 text-[#802008] hover:text-[#601005] hover:bg-[#fdf2f2] rounded shrink-0"><Link2 className="w-4 h-4" /></button>
             </>
           )}
 
           <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
-          {templates.map((t, i) => <button key={`t-${i}`} onClick={t.action} title={t.tip} className="p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded shrink-0">{t.icon}</button>)}
+          {templates.map((t, i) => <button key={`t-${i}`} onClick={t.action} title={t.tip} className="p-1.5 text-[#802008] hover:text-[#601005] hover:bg-[#fdf2f2] rounded shrink-0">{t.icon}</button>)}
         </div>
         {/* 编辑/预览切换 */}
         <div className="flex items-center bg-gray-100 rounded-md p-0.5 shrink-0 ml-2">
@@ -214,7 +214,7 @@ export default function MarkdownEditor({ value, onChange, onSave, enableExtended
             spellCheck={false}
           />
         ) : (
-          <div className="markdown-preview min-h-[300px] p-4 prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-p:leading-[1.8] prose-strong:!text-black prose-blockquote:border-l-amber-400 prose-blockquote:bg-amber-50/30 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r prose-table:text-sm prose-th:bg-gray-50 prose-th:font-medium prose-td:border-gray-100"
+          <div className="markdown-preview min-h-[300px] p-4 prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-p:leading-[1.8] prose-strong:!text-black prose-blockquote:border-l-[#c94d4d] prose-blockquote:bg-[#fdf2f2]/30 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r prose-table:text-sm prose-th:bg-gray-50 prose-th:font-medium prose-td:border-gray-100"
             style={{ fontFamily: '"Noto Serif SC", "Songti SC", serif' }}
             dangerouslySetInnerHTML={{ __html: previewHtml }}
           />
@@ -247,13 +247,13 @@ export default function MarkdownEditor({ value, onChange, onSave, enableExtended
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleTitleSearch(); }}
                 placeholder="输入帖子标题关键词..."
-                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400"
+                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d]"
                 autoFocus
               />
               <button
                 onClick={handleTitleSearch}
                 disabled={searching}
-                className="px-3 py-2 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 disabled:opacity-50"
+                className="px-3 py-2 bg-[#802008] text-white text-xs rounded-lg hover:bg-[#601005] disabled:opacity-50"
               >
                 {searching ? '搜索中...' : '搜索'}
               </button>
@@ -266,7 +266,7 @@ export default function MarkdownEditor({ value, onChange, onSave, enableExtended
                 <button
                   key={post.id}
                   onClick={() => selectPost(post)}
-                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-amber-50 rounded-lg transition-colors"
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-[#fdf2f2] rounded-lg transition-colors"
                 >
                   <span className="font-medium">{post.title}</span>
                   <span className="text-gray-400 ml-2">{post.author}</span>

@@ -22,6 +22,7 @@ declare global {
   interface Window {
     AndroidBridge?: AndroidBridgeInterface;
     onImportComplete?: (jsonContent: string) => void;
+    onBookImportComplete?: (fileName: string, content: string) => void;
   }
 }
 

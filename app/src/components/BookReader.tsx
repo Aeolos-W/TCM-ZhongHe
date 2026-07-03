@@ -101,19 +101,43 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
   }, [book, keywords, activeSearch]);
 
   // Jump to a specific line by scrolling
+  // Uses DOM text matching for accuracy; falls back to character-ratio estimate.
   const jumpToLine = useCallback((lineIdx: number) => {
     if (!contentRef.current || !book) return;
     const lines = book.content.split('\n');
-    let charCount = 0;
-    for (let i = 0; i < Math.min(lineIdx, lines.length); i++) {
-      charCount += lines[i].length + 1; // +1 for newline
-    }
-    // Approximate scroll position based on character ratio
-    const totalChars = book.content.length;
     const container = contentRef.current;
-    const ratio = charCount / totalChars;
-    const targetScroll = ratio * (container.scrollHeight - container.clientHeight);
-    container.scrollTo({ top: Math.max(0, targetScroll - 100), behavior: 'smooth' });
+
+    // Build search context from the target line (strip markdown heading syntax)
+    const rawLine = lines[lineIdx];
+    if (!rawLine) return;
+    const targetText = rawLine.trim().replace(/^#{1,6}\s+/, '');
+
+    // Try exact text match first for headings / short lines
+    if (targetText.length > 0) {
+      const elements = Array.from(container.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote, td'));
+      for (const el of elements) {
+        const elText = el.textContent?.trim() || '';
+        if (elText === targetText || elText.includes(targetText)) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+      }
+    }
+
+    // Fallback: improved ratio estimate that weights headings more heavily
+    let estimatedHeight = 0;
+    const avgLineHeight = container.scrollHeight / lines.length;
+    for (let i = 0; i < Math.min(lineIdx, lines.length); i++) {
+      const line = lines[i];
+      if (line.match(/^#{1,6}\s/)) {
+        estimatedHeight += avgLineHeight * 2.5; // headings take more space
+      } else if (line.trim() === '') {
+        estimatedHeight += avgLineHeight * 0.3; // empty lines
+      } else {
+        estimatedHeight += avgLineHeight;
+      }
+    }
+    container.scrollTo({ top: Math.max(0, estimatedHeight - 100), behavior: 'smooth' });
   }, [book]);
 
   // Scroll to TOC section
@@ -198,25 +222,25 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#fdfbf7] relative">
+    <div className="h-full flex flex-col bg-[#fdfbf7] relative">
       {/* Top Nav */}
       <div className="shrink-0 bg-white border-b border-gray-200 z-20">
         <div className="flex items-center justify-between px-3 h-11">
           <div className="flex items-center gap-2 min-w-0">
-            <button onClick={onBack} className="p-1.5 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded shrink-0">
+            <button onClick={onBack} className="p-1.5 text-gray-600 hover:text-[#802008] hover:bg-[#fdf2f2] rounded shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-sm font-bold text-gray-800 truncate" style={{ fontFamily: 'serif' }}>{book.title}</h1>
           </div>
           <div className="flex items-center gap-0.5 shrink-0">
-            <button onClick={() => setShowSearchBar(!showSearchBar)} className={`p-1.5 rounded ${showSearchBar ? 'text-amber-700 bg-amber-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <button onClick={() => setShowSearchBar(!showSearchBar)} className={`p-1.5 rounded ${showSearchBar ? 'text-[#802008] bg-[#fdf2f2]' : 'text-gray-500 hover:bg-gray-50'}`}>
               <Search className="w-4 h-4" />
             </button>
-            <button onClick={() => setShowComments(!showComments)} className={`p-1.5 rounded relative ${showComments ? 'text-amber-700 bg-amber-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <button onClick={() => setShowComments(!showComments)} className={`p-1.5 rounded relative ${showComments ? 'text-[#802008] bg-[#fdf2f2]' : 'text-gray-500 hover:bg-gray-50'}`}>
               <MessageCircle className="w-4 h-4" />
-              {book.comments.length > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-amber-500 text-white text-[9px] rounded-full flex items-center justify-center">{book.comments.length}</span>}
+              {book.comments.length > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#802008] text-white text-[9px] rounded-full flex items-center justify-center">{book.comments.length}</span>}
             </button>
-            <button onClick={() => setShowTOC(!showTOC)} className={`p-1.5 rounded ${showTOC ? 'text-amber-700 bg-amber-50' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <button onClick={() => setShowTOC(!showTOC)} className={`p-1.5 rounded ${showTOC ? 'text-[#802008] bg-[#fdf2f2]' : 'text-gray-500 hover:bg-gray-50'}`}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             </button>
           </div>
@@ -231,20 +255,20 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                 placeholder="输入关键词检索本书..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400" />
             </div>
-            <button onClick={handleSearch} className="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-md">搜索</button>
+            <button onClick={handleSearch} className="px-3 py-1.5 text-xs bg-[#802008] text-white rounded-md">搜索</button>
           </div>
         )}
 
         {/* Result counter: "关键词 1/13" navigation bar */}
         {activeSearch && searchResults.length > 0 && (
-          <div className="flex items-center justify-between px-3 py-1.5 bg-amber-50 border-t border-amber-100">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-[#fdf2f2] border-t border-[#f9d6d6]">
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-gray-800" style={{ fontFamily: '"Microsoft YaHei", sans-serif' }}>{searchQuery}</span>
-              <span className="text-sm font-bold text-amber-700">{currentResultIdx + 1}/{searchResults.length}</span>
+              <span className="text-sm font-bold text-[#601005]">{currentResultIdx + 1}/{searchResults.length}</span>
             </div>
             <div className="flex items-center gap-0.5">
-              <button onClick={goPrev} className="p-1 text-gray-500 hover:text-amber-600"><ChevronUp className="w-4 h-4" /></button>
-              <button onClick={goNext} className="p-1 text-gray-500 hover:text-amber-600"><ChevronDown className="w-4 h-4" /></button>
+              <button onClick={goPrev} className="p-1 text-gray-500 hover:text-[#802008]"><ChevronUp className="w-4 h-4" /></button>
+              <button onClick={goNext} className="p-1 text-gray-500 hover:text-[#802008]"><ChevronDown className="w-4 h-4" /></button>
               <button onClick={clearSearch} className="p-1 text-gray-400 hover:text-gray-600 ml-1"><X className="w-4 h-4" /></button>
             </div>
           </div>
@@ -262,7 +286,7 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 border-b border-gray-100">目录</div>
             {toc.map((item) => (
               <button key={item.lineIndex} onClick={() => scrollToChapter(item.lineIndex)}
-                className={`block w-full text-left px-3 py-1.5 text-xs hover:bg-amber-50 hover:text-amber-700 transition-colors ${
+                className={`block w-full text-left px-3 py-1.5 text-xs hover:bg-[#fdf2f2] hover:text-[#601005] transition-colors ${
                   item.level === 1 ? 'font-medium text-gray-800' : item.level === 2 ? 'pl-5 text-gray-600' : 'pl-8 text-gray-500'
                 }`}>{item.title}</button>
             ))}
@@ -273,7 +297,7 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
         {showComments && (
           <div className="absolute inset-y-0 right-0 z-10 w-64 bg-white border-l border-gray-200 overflow-y-auto">
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 border-b border-gray-100 flex justify-between">
-              <span>章节评论</span><span className="text-amber-600">{book.comments.length}条</span>
+              <span>章节评论</span><span className="text-[#802008]">{book.comments.length}条</span>
             </div>
             <div className="p-3 border-b border-gray-100">
               <select value={commentChapter} onChange={(e) => setCommentChapter(e.target.value)}
@@ -285,12 +309,12 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
                 <input value={commentText} onChange={(e) => setCommentText(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleAddComment(); }}
                   placeholder="输入评论..." className="flex-1 text-xs border border-gray-200 rounded px-2 py-1.5 outline-none" />
-                <button onClick={handleAddComment} className="p-1.5 bg-amber-600 text-white rounded hover:bg-amber-700"><Send className="w-3 h-3" /></button>
+                <button onClick={handleAddComment} className="p-1.5 bg-[#802008] text-white rounded hover:bg-[#601005]"><Send className="w-3 h-3" /></button>
               </div>
             </div>
             {Array.from(commentsByChapter.entries()).map(([ch, cs]) => (
               <div key={ch} className="border-b border-gray-50">
-                <div className="px-3 py-1.5 text-[11px] font-medium text-amber-700 bg-amber-50/50">{ch}</div>
+                <div className="px-3 py-1.5 text-[11px] font-medium text-[#601005] bg-[#fdf2f2]/50">{ch}</div>
                 {cs.map((c) => (
                   <div key={c.id} className="px-3 py-2 flex items-start gap-2">
                     <p className="flex-1 text-xs text-gray-600 leading-relaxed">{c.content}</p>

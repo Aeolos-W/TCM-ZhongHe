@@ -179,11 +179,30 @@ export function searchBooksV2(books: Book[], query: string): { groups: BookSearc
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Track chapter from headings
+      // Track chapter from headings, and also include headings in search
       const hm = line.match(/^#{1,3}\s+(.+)$/);
       if (hm) {
         currentChapter = hm[1].trim();
         currentCategory = '';
+
+        // Check if the heading itself matches keywords
+        const headingLower = line.toLowerCase();
+        const headingMatch = keywords.every((k) => headingLower.includes(k.toLowerCase()));
+        if (headingMatch) {
+          let chGroup = chapterGroups.find((c) => c.chapterTitle === currentChapter);
+          if (!chGroup) {
+            chGroup = { chapterTitle: currentChapter, count: 0, snippets: [] };
+            chapterGroups.push(chGroup);
+          }
+          chGroup.snippets.push({
+            excerpt: yellowHighlight(hm[1].trim(), keywords),
+            keywords: [...keywords],
+            lineIndex: i,
+            snippetIndex: ++globalSnippetIndex,
+            category: '标题',
+          });
+          chGroup.count++;
+        }
         continue;
       }
 

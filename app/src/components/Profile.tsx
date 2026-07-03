@@ -120,16 +120,16 @@ export default function Profile({ onOpenPost }: ProfileProps) {
         {/* 加载中状态 */}
         {authChecking && (
           <div className="flex flex-col items-center justify-center py-8">
-            <div className="w-8 h-8 border-2 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-3" />
+            <div className="w-8 h-8 border-2 border-[#f5b5b5] border-t-[#802008] rounded-full animate-spin mb-3" />
             <p className="text-xs text-gray-400">加载中...</p>
           </div>
         )}
 
         {/* 访客模式 */}
         {!authChecking && mode === 'visitor' && (
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-xl p-5 mb-4">
+          <div className="bg-gradient-to-br from-[#fdf2f2] to-orange-50 border border-[#f9d6d6] rounded-xl p-5 mb-4">
             <div className="flex flex-col items-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 text-2xl font-bold mb-2">
+              <div className="w-16 h-16 rounded-full bg-[#f5b5b5] flex items-center justify-center text-[#601005] text-2xl font-bold mb-2">
                 <User className="w-8 h-8" />
               </div>
               <h3 className="text-base font-medium text-gray-800">访客模式</h3>
@@ -142,7 +142,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                   onChange={(e) => setTempName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleVisitorEnter(); }}
                   placeholder="请输入昵称..."
-                  className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-amber-400"
+                  className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d]"
                   autoFocus
                 />
                 <button onClick={handleVisitorEnter} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded">
@@ -150,7 +150,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 mb-3 border border-amber-200/60">
+              <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2 mb-3 border border-[#f5b5b5]/60">
                 <span className="text-sm text-gray-700">当前昵称：{visitorName}</span>
                 <button onClick={() => { setTempName(visitorName); setEditingName(true); }} className="p-1 text-gray-400 hover:text-gray-600">
                   <Edit3 className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
             )}
             <button
               onClick={handleVisitorEnter}
-              className="w-full py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition-colors mb-3"
+              className="w-full py-2 bg-[#802008] text-white text-sm rounded-lg hover:bg-[#601005] transition-colors mb-3"
             >
               <ArrowRightCircle className="w-4 h-4 inline mr-1" />进入访客模式
             </button>
@@ -178,7 +178,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
             </div>
             <button
               onClick={() => setSubView('favorites')}
-              className="w-full py-2 mb-2 bg-white text-amber-700 border border-amber-200 text-sm rounded-lg hover:bg-amber-50 transition-colors flex items-center justify-center gap-1"
+              className="w-full py-2 mb-2 bg-white text-[#601005] border border-[#f5b5b5] text-sm rounded-lg hover:bg-[#fdf2f2] transition-colors flex items-center justify-center gap-1"
             >
               <Bookmark className="w-4 h-4" />我的收藏
             </button>
@@ -197,13 +197,13 @@ export default function Profile({ onOpenPost }: ProfileProps) {
             <div className="flex items-center gap-2 mb-4">
               <button
                 onClick={() => setMode('login')}
-                className={`flex-1 py-2 text-sm rounded-lg transition-colors ${mode === 'login' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`flex-1 py-2 text-sm rounded-lg transition-colors ${mode === 'login' ? 'bg-[#802008] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
               >
                 <LogIn className="w-4 h-4 inline mr-1" />登录
               </button>
               <button
                 onClick={() => setMode('register')}
-                className={`flex-1 py-2 text-sm rounded-lg transition-colors ${mode === 'register' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`flex-1 py-2 text-sm rounded-lg transition-colors ${mode === 'register' ? 'bg-[#802008] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
               >
                 <KeyRound className="w-4 h-4 inline mr-1" />注册
               </button>
@@ -218,7 +218,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={username}
                     onChange={(e) => setUsernameState(e.target.value)}
                     placeholder="用户名（用于发帖署名）"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <div className="relative">
@@ -228,7 +228,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="邮箱地址"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <div className="relative">
@@ -238,13 +238,13 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="密码"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <button
                   onClick={handleLogin}
                   disabled={loading}
-                  className="w-full py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                  className="w-full py-2 bg-[#802008] text-white text-sm rounded-lg hover:bg-[#601005] disabled:opacity-50 transition-colors"
                 >
                   {loading ? '登录中...' : '登录'}
                 </button>
@@ -260,7 +260,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={username}
                     onChange={(e) => setUsernameState(e.target.value)}
                     placeholder="用户名（用于发帖署名）"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <div className="relative">
@@ -270,7 +270,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="邮箱地址"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <div className="relative">
@@ -280,7 +280,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="密码（至少6位）"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <div className="relative">
@@ -290,13 +290,13 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="显示昵称"
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d]"
                   />
                 </div>
                 <button
                   onClick={handleRegister}
                   disabled={loading}
-                  className="w-full py-2 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                  className="w-full py-2 bg-[#802008] text-white text-sm rounded-lg hover:bg-[#601005] disabled:opacity-50 transition-colors"
                 >
                   {loading ? '注册中...' : '注册'}
                 </button>
@@ -336,7 +336,7 @@ export default function Profile({ onOpenPost }: ProfileProps) {
                   <button
                     key={post.id}
                     onClick={() => { onOpenPost?.(post.id); setSubView('main'); }}
-                    className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-amber-50 transition-colors"
+                    className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-[#fdf2f2] transition-colors"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-medium text-gray-800 line-clamp-1">{post.title}</span>

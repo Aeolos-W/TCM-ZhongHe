@@ -195,7 +195,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
     record: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     post: 'bg-blue-50 text-blue-700 border-blue-200',
     qa: 'bg-purple-50 text-purple-700 border-purple-200',
-    experience: 'bg-amber-50 text-amber-700 border-amber-200',
+    experience: 'bg-[#fdf2f2] text-[#601005] border-[#f5b5b5]',
   }[fullPost.type] || 'bg-gray-50 text-gray-700 border-gray-200';
 
   return (
@@ -209,7 +209,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
         <button
           onClick={toggleFavorite}
           disabled={favLoading}
-          className={`flex items-center gap-1 px-2 py-1 text-xs rounded border transition-colors ${isFav ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-gray-400 bg-white border-gray-200 hover:text-amber-600 hover:border-amber-300'}`}
+          className={`flex items-center gap-1 px-2 py-1 text-xs rounded border transition-colors ${isFav ? 'text-[#601005] bg-[#fdf2f2] border-[#f5b5b5]' : 'text-gray-400 bg-white border-gray-200 hover:text-[#802008] hover:border-[#ee8a8a]'}`}
           title={isFav ? '取消收藏' : '收藏'}
         >
           <Bookmark className="w-3 h-3" fill={isFav ? 'currentColor' : 'none'} />{isFav ? '已收藏' : '收藏'}
@@ -217,7 +217,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
         {isOwner && (
           <button
             onClick={() => onEdit(fullPost)}
-            className="flex items-center gap-1 px-2 py-1 text-xs text-amber-700 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200"
+            className="flex items-center gap-1 px-2 py-1 text-xs text-[#601005] bg-[#fdf2f2] hover:bg-[#f9d6d6] rounded border border-[#f5b5b5]"
           >
             <Edit3 className="w-3 h-3" />编辑
           </button>
@@ -245,7 +245,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
           )}
 
           <div
-            className="post-content prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-p:leading-[1.8] prose-strong:!text-black prose-blockquote:border-l-amber-400 prose-blockquote:bg-amber-50/30 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r prose-table:text-sm prose-th:bg-gray-50 prose-th:font-medium prose-td:border-gray-100"
+            className="post-content prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-p:leading-[1.8] prose-strong:!text-black prose-blockquote:border-l-[#c94d4d] prose-blockquote:bg-[#fdf2f2]/30 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:rounded-r prose-table:text-sm prose-th:bg-gray-50 prose-th:font-medium prose-td:border-gray-100"
             style={{ fontFamily: '"Noto Serif SC", "Songti SC", serif' }}
             dangerouslySetInnerHTML={{ __html: renderedContent }}
             onClick={handleContentClick}
@@ -280,7 +280,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
                   {/* 内容区 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs font-semibold text-amber-700">{c.author}</span>
+                      <span className="text-xs font-semibold text-[#601005]">{c.author}</span>
                       <span className="text-[10px] text-gray-400">
                         {format(new Date(c.created_at), 'yyyy-MM-dd HH:mm', { locale: zhCN })}
                       </span>
@@ -289,7 +289,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
                           setReplyTo(c.author);
                           setCommentText(`@${c.author}: `);
                         }}
-                        className="text-[10px] text-gray-400 hover:text-amber-600 ml-auto"
+                        className="text-[10px] text-gray-400 hover:text-[#802008] ml-auto"
                       >
                         回复
                       </button>
@@ -306,7 +306,7 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
             <div className="flex-1">
               {replyTo && (
                 <div className="flex items-center gap-1 mb-1">
-                  <span className="text-[10px] text-amber-600">回复 @{replyTo}</span>
+                  <span className="text-[10px] text-[#802008]">回复 @{replyTo}</span>
                   <button
                     onClick={() => { setReplyTo(null); setCommentText(''); }}
                     className="text-[10px] text-gray-400 hover:text-gray-600"
@@ -319,13 +319,13 @@ export default function PostDetail({ post, onBack, onEdit }: PostDetailProps) {
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="写下你的评论..."
-                className="w-full min-h-[60px] max-h-[120px] p-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-amber-400 resize-y"
+                className="w-full min-h-[60px] max-h-[120px] p-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d] resize-y"
               />
             </div>
             <button
               onClick={handleSendComment}
               disabled={sending || !commentText.trim()}
-              className="shrink-0 px-3 py-2 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="shrink-0 px-3 py-2 bg-[#802008] text-white text-xs rounded-lg hover:bg-[#601005] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Send className="w-4 h-4" />
             </button>

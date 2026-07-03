@@ -12,7 +12,7 @@ export function renderMarkdownToHtml(markdown: string): string {
     const text = this.parser.parseInline(tokens);
     if (href.startsWith('post:')) {
       const postId = href.slice(5);
-      return `<a href="javascript:void(0)" data-post-id="${postId}" class="post-reference inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-sm hover:bg-amber-100 transition-colors" onclick="window.dispatchEvent(new CustomEvent('navigate-to-post',{detail:'${postId}'}))">📄 ${text || '引用帖子'}</a>`;
+      return `<a href="javascript:void(0)" data-post-id="${postId}" class="post-reference inline-flex items-center gap-1 px-2 py-0.5 bg-[#fdf2f2] text-[#601005] border border-[#f5b5b5] rounded text-sm hover:bg-[#f9d6d6] transition-colors" onclick="window.dispatchEvent(new CustomEvent('navigate-to-post',{detail:'${postId}'}))">📄 ${text || '引用帖子'}</a>`;
     }
     return originalLink(token);
   };

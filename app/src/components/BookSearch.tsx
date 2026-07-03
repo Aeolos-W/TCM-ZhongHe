@@ -73,7 +73,7 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
       {/* Header with search query */}
       <div className="shrink-0 bg-white border-b border-gray-200">
         <div className="flex items-center gap-3 px-4 h-12">
-          <button onClick={onBack} className="p-1.5 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded">
+          <button onClick={onBack} className="p-1.5 text-gray-600 hover:text-[#802008] hover:bg-[#fdf2f2] rounded">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1 flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
@@ -86,7 +86,7 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
             />
           </div>
-          <button onClick={handleSearch} className="px-4 py-1.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg">
+          <button onClick={handleSearch} className="px-4 py-1.5 text-sm font-medium text-white bg-[#802008] hover:bg-[#601005] rounded-lg">
             检索
           </button>
         </div>
@@ -95,11 +95,11 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
         {searched && (
           <div className="flex items-center justify-between px-4 py-2 border-t border-gray-100">
             <div className="text-xs text-gray-500">
-              找到 <span className="text-amber-700 font-bold">{total}</span> 条段落结果
-              {bookCount > 0 && <span> · <span className="text-amber-700 font-bold">{bookCount}</span> 本书</span>}
+              找到 <span className="text-[#601005] font-bold">{total}</span> 条段落结果
+              {bookCount > 0 && <span> · <span className="text-[#601005] font-bold">{bookCount}</span> 本书</span>}
             </div>
             {total > 0 && (
-              <button onClick={handleExport} className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800">
+              <button onClick={handleExport} className="flex items-center gap-1 text-xs text-[#601005] hover:text-[#400803]">
                 <Share2 className="w-3.5 h-3.5" />导出并分享
               </button>
             )}
@@ -175,11 +175,11 @@ export default function BookSearch({ books, initialQuery = '', onOpenBook, onBac
                               <button
                                 key={s.snippetIndex}
                                 onClick={() => onOpenBook(bg.bookId, query, s.lineIndex)}
-                                className="block w-full text-left px-6 py-3 border-b border-gray-50 hover:bg-amber-50/20 transition-colors"
+                                className="block w-full text-left px-6 py-3 border-b border-gray-50 hover:bg-[#fdf2f2]/20 transition-colors"
                               >
                                 <div className="flex items-center gap-2 mb-1.5">
                                   <span className="px-2 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">节选{s.snippetIndex}</span>
-                                  {s.category && <span className="px-2 py-0.5 text-[10px] bg-amber-50 text-amber-700 rounded">{s.category}</span>}
+                                  {s.category && <span className="px-2 py-0.5 text-[10px] bg-[#fdf2f2] text-[#601005] rounded">{s.category}</span>}
                                 </div>
                                 <p
                                   className="text-sm text-gray-700 leading-relaxed"

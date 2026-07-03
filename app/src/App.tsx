@@ -161,13 +161,13 @@ function AppContent() {
     >
       {/* 热更新提示条 */}
       {updateInfo && (
-        <div className="shrink-0 px-3 py-1.5 bg-amber-50 border-b border-amber-200 flex items-center justify-between">
-          <span className="text-xs text-amber-800">
+        <div className="shrink-0 px-3 py-1.5 bg-[#fdf2f2] border-b border-[#f5b5b5] flex items-center justify-between">
+          <span className="text-xs text-[#400803]">
             发现新版本 {updateInfo.version} {updateInfo.force ? '(强制更新)' : ''}
           </span>
           <button
             onClick={handleDownloadUpdate}
-            className="text-xs px-2 py-0.5 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
+            className="text-xs px-2 py-0.5 bg-[#802008] text-white rounded hover:bg-[#601005] transition-colors"
           >
             立即更新
           </button>
@@ -180,7 +180,7 @@ function AppContent() {
           <button
             onClick={() => handleTabSwitch('yian')}
             className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
-              activeTab === 'yian' ? 'text-amber-700 bg-amber-50 font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              activeTab === 'yian' ? 'text-[#601005] bg-[#fdf2f2] font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             医案库{state.records.length > 0 && <span className="ml-0.5 text-[10px]">({state.records.length})</span>}
@@ -188,7 +188,7 @@ function AppContent() {
           <button
             onClick={() => handleTabSwitch('dianji')}
             className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
-              activeTab === 'dianji' ? 'text-amber-700 bg-amber-50 font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              activeTab === 'dianji' ? 'text-[#601005] bg-[#fdf2f2] font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             典籍库{books.length > 0 && <span className="ml-0.5 text-[10px]">({books.length})</span>}
@@ -196,7 +196,7 @@ function AppContent() {
           <button
             onClick={() => handleTabSwitch('community')}
             className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
-              activeTab === 'community' ? 'text-amber-700 bg-amber-50 font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              activeTab === 'community' ? 'text-[#601005] bg-[#fdf2f2] font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             社区
@@ -204,7 +204,7 @@ function AppContent() {
           <button
             onClick={() => handleTabSwitch('profile')}
             className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
-              activeTab === 'profile' ? 'text-amber-700 bg-amber-50 font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              activeTab === 'profile' ? 'text-[#601005] bg-[#fdf2f2] font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             我的

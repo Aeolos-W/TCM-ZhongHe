@@ -178,9 +178,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_IMPORT && resultCode == Activity.RESULT_OK && data != null) {
-            Uri uri = data.getData();
-            if (uri != null) {
-                handleImportFile(uri);
+            // Handle multiple file selection
+            if (data.getClipData() != null) {
+                int count = data.getClipData().getItemCount();
+                for (int i = 0; i < count; i++) {
+                    Uri uri = data.getClipData().getItemAt(i).getUri();
+                    if (uri != null) {
+                        handleImportFile(uri);
+                    }
+                }
+            } else {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    handleImportFile(uri);
+                }
             }
         }
     }
@@ -389,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // ========== Import: Open system file picker ==========
+        // ========== Import: Open system file picker (supports multiple selection) ==========
         @JavascriptInterface
         public void importData() {
             new Handler(Looper.getMainLooper()).post(() -> {
@@ -398,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("application/json");
                     intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain", "*/*"});
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                     startActivityForResult(intent, REQUEST_CODE_IMPORT);
                 } catch (Exception e) {
                     Log.e(TAG, "Import picker error", e);

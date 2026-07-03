@@ -57,20 +57,20 @@ export default function TopNavigation() {
       {/* 主Tab栏 */}
       <div className="flex items-center px-3 sm:px-4 h-11 sm:h-12 border-b border-gray-100 overflow-hidden">
         <div className="flex items-center gap-1.5 mr-3 sm:mr-6 shrink-0">
-          <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+          <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-[#802008]" />
           <span className="text-sm font-bold text-gray-800 hidden sm:inline">仲景医案录</span>
           <span className="text-sm font-bold text-gray-800 sm:hidden">医案录</span>
         </div>
         <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0">
-          <button className="px-2.5 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap shrink-0 text-amber-700 bg-amber-50 font-medium">
-            医案库{recordCount > 0 && <span className="ml-0.5 text-[10px] text-amber-500">({recordCount})</span>}
+          <button className="px-2.5 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap shrink-0 text-[#601005] bg-[#fdf2f2] font-medium">
+            医案库{recordCount > 0 && <span className="ml-0.5 text-[10px] text-[#a83232]">({recordCount})</span>}
           </button>
         </div>
       </div>
       {/* 工具栏 */}
       <div className="flex items-center justify-between px-3 sm:px-4 h-9 sm:h-10 bg-gray-50/60">
         <div className="flex items-center gap-2">
-          <button onClick={() => { createRecord(); }} className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md transition-colors">
+          <button onClick={() => { createRecord(); }} className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-medium text-white bg-[#802008] hover:bg-[#601005] rounded-md transition-colors">
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">新建医案</span>
             <span className="sm:hidden">新建</span>
@@ -85,7 +85,7 @@ export default function TopNavigation() {
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">导出</span>
           </button>
-          <button onClick={handleImport} className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs text-amber-700 hover:text-amber-800 hover:bg-amber-50 rounded-md transition-colors" title="导入医案">
+          <button onClick={handleImport} className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs text-[#601005] hover:text-[#400803] hover:bg-[#fdf2f2] rounded-md transition-colors" title="导入医案">
             <Upload className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">导入</span>
           </button>

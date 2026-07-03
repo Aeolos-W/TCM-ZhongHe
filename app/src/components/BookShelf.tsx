@@ -95,15 +95,20 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
       alert('书架为空，没有可导出的书籍');
       return;
     }
-    const blob = new Blob([JSON.stringify(allBooks, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `书架备份_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const json = JSON.stringify(allBooks, null, 2);
+    if (isWebView() && window.AndroidBridge) {
+      window.AndroidBridge.exportData(json);
+    } else {
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `书架备份_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   };
 
   // 批量导入（浏览器模式）
@@ -124,6 +129,31 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
     e.target.value = '';
   };
 
+  // WebView: batch import via native bridge
+  const handleBatchImportClick = () => {
+    if (isWebView()) {
+      window.onBookImportComplete = async (fileName: string, content: string) => {
+        try {
+          const { importBookFromText } = await import('@/lib/bookService');
+          await importBookFromText(fileName, content);
+          await refresh();
+          if (window.AndroidBridge) {
+            window.AndroidBridge.showToast(`《${fileName.replace(/\.md$|\.txt$/i, '')}》导入成功`);
+          }
+        } catch (err: any) {
+          if (window.AndroidBridge) {
+            window.AndroidBridge.showToast('导入失败：' + (err.message || '未知错误'));
+          }
+        }
+      };
+      if (window.AndroidBridge) {
+        window.AndroidBridge.importData();
+      }
+    } else {
+      batchFileInputRef.current?.click();
+    }
+  };
+
   const handleDelete = async (id: string, title: string) => {
     if (!window.confirm(`确定删除《${title}》？`)) return;
     await deleteBook(id);
@@ -140,7 +170,7 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
       <div className="shrink-0 border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between px-4 h-12">
           <div className="flex items-center gap-3">
-            <button onClick={onBack} className="p-1.5 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors">
+            <button onClick={onBack} className="p-1.5 text-gray-600 hover:text-[#802008] hover:bg-[#fdf2f2] rounded transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-base font-bold text-gray-800">本地书架</h1>
@@ -149,11 +179,11 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
             <button onClick={handleBatchExport} className="flex items-center gap-1 px-3 py-1.5 text-xs text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-md transition-colors">
               <Download className="w-3.5 h-3.5" />批量导出
             </button>
-            <button onClick={() => batchFileInputRef.current?.click()} className="flex items-center gap-1 px-3 py-1.5 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors">
+            <button onClick={handleBatchImportClick} className="flex items-center gap-1 px-3 py-1.5 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors">
               <FolderPlus className="w-3.5 h-3.5" />批量导入
             </button>
             <input ref={batchFileInputRef} type="file" accept=".md,.txt,.json" multiple onChange={handleBatchFileChange} className="hidden" />
-            <button onClick={handleImportClick} className="flex items-center gap-1 px-3 py-1.5 text-xs text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-md transition-colors">
+            <button onClick={handleImportClick} className="flex items-center gap-1 px-3 py-1.5 text-xs text-[#601005] bg-[#fdf2f2] hover:bg-[#f9d6d6] rounded-md transition-colors">
               <Upload className="w-3.5 h-3.5" />导入书籍
             </button>
             <input ref={fileInputRef} type="file" accept=".md,.txt,.json" onChange={handleFileChange} className="hidden" />
@@ -178,7 +208,7 @@ export default function BookShelf({ onOpenBook, onBack, onGlobalSearch }: BookSh
             </div>
             <button
               onClick={() => { if (filter.trim() && onGlobalSearch) onGlobalSearch(filter.trim()); }}
-              className="px-3 py-2 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors shrink-0"
+              className="px-3 py-2 text-xs bg-[#802008] text-white rounded-lg hover:bg-[#601005] transition-colors shrink-0"
             >
               全文检索
             </button>

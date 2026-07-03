@@ -29,12 +29,12 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 p-2 bg-white border border-gray-200 rounded-lg focus-within:border-amber-400 focus-within:ring-1 focus-within:ring-amber-400/20 transition-all min-h-[36px]"
+    <div className="flex flex-wrap items-center gap-1.5 p-2 bg-white border border-gray-200 rounded-lg focus-within:border-[#c94d4d] focus-within:ring-1 focus-within:ring-[#c94d4d]/20 transition-all min-h-[36px]"
       onClick={() => inputRef.current?.focus()}>
       {tags.map((tag, i) => (
-        <span key={`${tag}-${i}`} className="inline-flex items-center gap-0.5 px-2 py-0.5 text-xs bg-amber-50 text-amber-700 border border-amber-200/60 rounded-md">
+        <span key={`${tag}-${i}`} className="inline-flex items-center gap-0.5 px-2 py-0.5 text-xs bg-[#fdf2f2] text-[#601005] border border-[#f5b5b5]/60 rounded-md">
           {tag}
-          <button onClick={(e) => { e.stopPropagation(); removeTag(i); }} className="text-amber-400 hover:text-amber-600"><XCircle className="w-3 h-3" /></button>
+          <button onClick={(e) => { e.stopPropagation(); removeTag(i); }} className="text-[#c94d4d] hover:text-[#802008]"><XCircle className="w-3 h-3" /></button>
         </span>
       ))}
       <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} onBlur={() => { if (input.trim()) addTag(input); }}
@@ -126,7 +126,7 @@ export default function DetailPanel() {
         </h2>
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={handleSave} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="保存"><Save className="w-4 h-4" /></button>
-          <button className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded" title="收藏"><Bookmark className="w-4 h-4" /></button>
+          <button className="p-1.5 text-gray-400 hover:text-[#802008] hover:bg-[#fdf2f2] rounded" title="收藏"><Bookmark className="w-4 h-4" /></button>
           <button onClick={handleDelete} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded" title="删除"><Trash2 className="w-4 h-4" /></button>
           <button onClick={() => selectRecord(null)} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded" title="关闭"><X className="w-4 h-4" /></button>
         </div>
@@ -143,19 +143,19 @@ export default function DetailPanel() {
                 <label className="text-xs text-gray-500 mb-1 block">案例名 <span className="text-gray-300">(例: 张仲景治王某伤寒病案)</span></label>
                 <input value={title} onChange={(e) => setTitle(e.target.value)} onBlur={handleSave}
                   placeholder={titleHint}
-                  className="w-full text-base font-semibold text-gray-800 bg-transparent border-b border-gray-200 focus:border-amber-400 outline-none px-1 py-1 transition-colors" />
+                  className="w-full text-base font-semibold text-gray-800 bg-transparent border-b border-gray-200 focus:border-[#c94d4d] outline-none px-1 py-1 transition-colors" />
               </div>
               {/* 医师/患者 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">医师</label>
                   <input value={doctor} onChange={(e) => setDoctor(e.target.value)} onBlur={handleSave} placeholder="医师姓名"
-                    className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                    className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">患者</label>
                   <input value={patient} onChange={(e) => setPatient(e.target.value)} onBlur={handleSave} placeholder="患者姓名"
-                    className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                    className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
                 </div>
               </div>
               {/* 地点/年代/日期 */}
@@ -165,7 +165,7 @@ export default function DetailPanel() {
                   <div className="relative">
                     <MapPin className="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" />
                     <input value={location} onChange={(e) => setLocation(e.target.value)} onBlur={handleSave} placeholder="地点"
-                      className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                      className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
                   </div>
                 </div>
                 <div>
@@ -173,7 +173,7 @@ export default function DetailPanel() {
                   <div className="relative">
                     <Clock className="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" />
                     <input value={era} onChange={(e) => setEra(e.target.value)} onBlur={handleSave} placeholder="年代"
-                      className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                      className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
                   </div>
                 </div>
                 <div>
@@ -194,17 +194,17 @@ export default function DetailPanel() {
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">病因</label>
                 <input value={cause} onChange={(e) => setCause(e.target.value)} onBlur={handleSave} placeholder="如：外感风寒"
-                  className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                  className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">病所</label>
                 <input value={locationOfDisease} onChange={(e) => setLocationOfDisease(e.target.value)} onBlur={handleSave} placeholder="如：太阳经"
-                  className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                  className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">病机</label>
                 <input value={mechanism} onChange={(e) => setMechanism(e.target.value)} onBlur={handleSave} placeholder="如：营卫不和"
-                  className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                  className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
               </div>
             </div>
           </Section>
@@ -229,22 +229,22 @@ export default function DetailPanel() {
             <div className="mt-2">
               <label className="text-xs text-gray-500 mb-1 block">来源/经典</label>
               <input value={source} onChange={(e) => setSource(e.target.value)} onBlur={handleSave} placeholder="如：《伤寒论》"
-                className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all" />
+                className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all" />
             </div>
             <textarea value={syndromeDiagnosis} onChange={(e) => setSyndromeDiagnosis(e.target.value)} onBlur={handleSave} placeholder="详细证候及疾病诊断描述..."
-              className="w-full mt-2 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all resize-y min-h-[60px]" />
+              className="w-full mt-2 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all resize-y min-h-[60px]" />
           </Section>
 
           {/* === 关键分析 === */}
           <Section icon={<Lightbulb className="w-4 h-4" />} label="关键分析">
             <textarea value={keyAnalysis} onChange={(e) => setKeyAnalysis(e.target.value)} onBlur={handleSave} placeholder="医案的关键分析要点..."
-              className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all resize-y min-h-[60px]" />
+              className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all resize-y min-h-[60px]" />
           </Section>
 
           {/* === 引用经典 === */}
           <Section icon={<BookOpen className="w-4 h-4" />} label="引用经典">
             <textarea value={classicReference} onChange={(e) => setClassicReference(e.target.value)} onBlur={handleSave} placeholder="引用古籍经典条文..."
-              className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all resize-y min-h-[60px]" />
+              className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all resize-y min-h-[60px]" />
           </Section>
 
           {/* === 标签 === */}
@@ -256,7 +256,7 @@ export default function DetailPanel() {
           <div className="mb-2 mt-6">
             <div className="flex items-center gap-4 border-b border-gray-200 mb-3">
               {(['edit', 'preview'] as const).map((t) => (
-                <button key={t} onClick={() => setActiveTab(t)} className={`px-1 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${activeTab === t ? 'text-amber-700 border-amber-500' : 'text-gray-500 border-transparent hover:text-gray-700'}`}>
+                <button key={t} onClick={() => setActiveTab(t)} className={`px-1 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${activeTab === t ? 'text-[#601005] border-[#a83232]' : 'text-gray-500 border-transparent hover:text-gray-700'}`}>
                   {t === 'edit' ? '编辑正文' : '阅读视图'}
                 </button>
               ))}
@@ -268,7 +268,7 @@ export default function DetailPanel() {
             <MarkdownEditor value={content} onChange={setContent} onSave={handleSave} />
           ) : (
             <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-              <div className="min-h-[300px] p-4 prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-p:leading-[1.8] prose-strong:text-gray-800 prose-blockquote:border-l-amber-400 prose-blockquote:bg-amber-50/30 prose-table:text-sm prose-th:bg-gray-50 prose-th:font-medium prose-td:border-gray-100"
+              <div className="min-h-[300px] p-4 prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-p:leading-[1.8] prose-strong:text-gray-800 prose-blockquote:border-l-[#c94d4d] prose-blockquote:bg-[#fdf2f2]/30 prose-table:text-sm prose-th:bg-gray-50 prose-th:font-medium prose-td:border-gray-100"
                 style={{ fontFamily: '"Noto Serif SC", "Songti SC", serif' }}
                 dangerouslySetInnerHTML={{ __html: previewHtml || '<p class="text-gray-400 italic text-center py-8">暂无内容</p>' }} />
             </div>

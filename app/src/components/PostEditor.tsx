@@ -99,7 +99,7 @@ export default function PostEditor({ editPost, onBack, onSaved }: PostEditorProp
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1 px-3 py-1.5 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 bg-[#802008] text-white text-xs rounded-lg hover:bg-[#601005] disabled:opacity-50 transition-colors"
         >
           <Save className="w-3.5 h-3.5" />
           {saving ? '保存中...' : '发布'}
@@ -118,7 +118,7 @@ export default function PostEditor({ editPost, onBack, onSaved }: PostEditorProp
                 onClick={() => setType(opt.value)}
                 className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border transition-colors ${
                   type === opt.value
-                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    ? 'bg-[#fdf2f2] text-[#601005] border-[#f5b5b5]'
                     : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                 }`}
               >
@@ -136,7 +136,7 @@ export default function PostEditor({ editPost, onBack, onSaved }: PostEditorProp
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="请输入标题..."
-            className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all"
+            className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all"
           />
         </div>
 
@@ -159,7 +159,7 @@ export default function PostEditor({ editPost, onBack, onSaved }: PostEditorProp
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="请输入署名（选填）..."
-            className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all"
+            className="w-full text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all"
           />
         </div>
 
@@ -172,16 +172,16 @@ export default function PostEditor({ editPost, onBack, onSaved }: PostEditorProp
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
               placeholder="输入标签，按回车添加..."
-              className="flex-1 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 transition-all"
+              className="flex-1 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20 transition-all"
             />
             <button onClick={addTag} className="px-3 py-2 bg-gray-100 text-gray-600 text-xs rounded-lg hover:bg-gray-200">添加</button>
           </div>
           {tags.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 mt-2">
               {tags.map((tag, i) => (
-                <span key={`${tag}-${i}`} className="inline-flex items-center gap-0.5 px-2 py-0.5 text-xs bg-amber-50 text-amber-700 border border-amber-200/60 rounded-md">
+                <span key={`${tag}-${i}`} className="inline-flex items-center gap-0.5 px-2 py-0.5 text-xs bg-[#fdf2f2] text-[#601005] border border-[#f5b5b5]/60 rounded-md">
                   {tag}
-                  <button onClick={() => removeTag(i)} className="text-amber-400 hover:text-amber-600">×</button>
+                  <button onClick={() => removeTag(i)} className="text-[#c94d4d] hover:text-[#802008]">×</button>
                 </span>
               ))}
             </div>

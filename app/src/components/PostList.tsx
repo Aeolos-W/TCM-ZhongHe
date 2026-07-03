@@ -23,7 +23,7 @@ const typeColor: Record<string, string> = {
   record: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   post: 'bg-blue-50 text-blue-700 border-blue-200',
   qa: 'bg-purple-50 text-purple-700 border-purple-200',
-  experience: 'bg-amber-50 text-amber-700 border-amber-200',
+  experience: 'bg-[#fdf2f2] text-[#601005] border-[#f5b5b5]',
 };
 
 const typeLabel: Record<string, string> = {
@@ -69,7 +69,7 @@ export default function PostList({ onSelectPost, onCreatePost, refreshTrigger = 
       <div className="shrink-0 px-4 py-3 border-b border-gray-200">
         <div className="flex items-center gap-3 mb-3">
           <h2 className="text-base font-semibold text-gray-800 flex items-center gap-1.5">
-            <MessageSquare className="w-5 h-5 text-amber-600" />
+            <MessageSquare className="w-5 h-5 text-[#802008]" />
             仲景社区
           </h2>
           <div className="flex-1 relative">
@@ -78,7 +78,7 @@ export default function PostList({ onSelectPost, onCreatePost, refreshTrigger = 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="搜索帖子、医案、标签..."
-              className="w-full pl-8 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20"
+              className="w-full pl-8 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#c94d4d] focus:ring-1 focus:ring-[#c94d4d]/20"
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
@@ -88,7 +88,7 @@ export default function PostList({ onSelectPost, onCreatePost, refreshTrigger = 
           </div>
           <button
             onClick={onCreatePost}
-            className="shrink-0 flex items-center gap-1 px-3 py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 transition-colors"
+            className="shrink-0 flex items-center gap-1 px-3 py-1.5 bg-[#802008] text-white text-sm rounded-lg hover:bg-[#601005] transition-colors"
           >
             <Plus className="w-4 h-4" />发布
           </button>
@@ -101,7 +101,7 @@ export default function PostList({ onSelectPost, onCreatePost, refreshTrigger = 
               onClick={() => setActiveFilter(f.key)}
               className={`shrink-0 flex items-center gap-1 px-3 py-1 text-xs rounded-full border transition-colors ${
                 activeFilter === f.key
-                  ? 'bg-amber-600 text-white border-amber-600'
+                  ? 'bg-[#802008] text-white border-[#802008]'
                   : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
               }`}
             >
