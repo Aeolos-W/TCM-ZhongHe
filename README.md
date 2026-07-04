@@ -18,6 +18,7 @@
 - **书架管理**：收录中医经典著作，支持本地阅读
 - **阅读进度**：自动记录阅读位置
 - **书籍搜索**：快速检索书库中的典籍
+- **字体设置**：阅读字体为微软雅黑，舒适易读
 
 ### 社区交流
 - **帖子发布**：分享医案、答疑、体会经验
@@ -43,31 +44,54 @@
 | 状态管理 | React Context + hooks |
 | 后端服务 | Supabase (社区、认证) |
 | 本地存储 | Android WebView Bridge + 文件系统 |
-| 移动端 | Android WebView (minSdk 24) |
+| 移动端 | Android WebView (minSdk 24, targetSdk 34) |
+| 构建系统 | Gradle 8.4 + Android Gradle Plugin 8.1.0 |
 
 ---
 
 ## 项目结构
 
 ```
-app/
+app/                          # 前端 React 项目
 ├── src/
-│   ├── components/          # React 组件
-│   │   ├── ui/             # shadcn/ui 基础组件
-│   │   ├── BookReader.tsx  # 典籍阅读器
-│   │   ├── CaseList.tsx    # 医案列表
-│   │   ├── Community.tsx   # 社区主组件
-│   │   ├── PostList.tsx    # 帖子列表
-│   │   ├── Profile.tsx     # 个人中心
-│   │   └── SplashScreen.tsx # 启动页
+│   ├── components/           # React 组件
+│   │   ├── ui/              # shadcn/ui 基础组件
+│   │   ├── BookReader.tsx   # 典籍阅读器
+│   │   ├── BookShelf.tsx    # 书架管理
+│   │   ├── BookSearch.tsx   # 书籍搜索
+│   │   ├── CaseList.tsx     # 医案列表
+│   │   ├── CaseCard.tsx     # 医案卡片
+│   │   ├── CaseTreeView.tsx # 树状浏览
+│   │   ├── Community.tsx    # 社区主组件
+│   │   ├── PostList.tsx     # 帖子列表
+│   │   ├── PostEditor.tsx   # 帖子编辑器
+│   │   ├── PostDetail.tsx   # 帖子详情
+│   │   ├── Profile.tsx      # 个人中心
+│   │   ├── FolderPicker.tsx # 启动页（自动进入）
+│   │   └── TopNavigation.tsx # 顶部导航
 │   ├── lib/
-│   │   ├── dataStore.tsx   # 数据状态管理
-│   │   ├── supabase.ts     # Supabase 客户端
-│   │   └── fileSystemService.ts # 文件系统抽象
-│   ├── types/              # TypeScript 类型定义
-│   └── App.tsx             # 应用入口
-├── android/                # Android 原生层 (WebView + JS Bridge)
-└── dist/                   # 构建产物
+│   │   ├── dataStore.tsx    # 数据状态管理
+│   │   ├── supabase.ts      # Supabase 客户端（需自行配置）
+│   │   ├── fileSystemService.ts # 文件系统抽象
+│   │   ├── bookService.ts   # 典籍服务
+│   │   ├── renderMarkdown.ts # Markdown 渲染
+│   │   └── config.ts        # 应用配置
+│   ├── types/               # TypeScript 类型定义
+│   ├── pages/               # 页面组件
+│   └── App.tsx              # 应用入口
+├── public/                  # 静态资源
+│   └── splash-assets/       # 启动页素材
+└── index.html               # 入口 HTML
+
+android-app/                  # Android 原生项目
+├── app/
+│   ├── src/main/
+│   │   ├── java/com/zhongjing/medical/  # Java 源码
+│   │   ├── res/             # 资源文件（图标、布局等）
+│   │   └── assets/          # 前端构建产物
+│   └── build.gradle         # 应用构建配置
+├── build.gradle             # 项目构建配置
+└── gradle/                  # Gradle Wrapper
 ```
 
 ---
@@ -77,7 +101,8 @@ app/
 ### 环境要求
 - Node.js >= 20
 - npm 或 yarn
-- Android Studio (如需构建 APK)
+- JDK 17
+- Android SDK（platforms;android-34, build-tools;34.0.0）
 
 ### 安装依赖
 ```bash
@@ -95,43 +120,94 @@ npm run dev
 npm run build
 ```
 
-构建产物将输出到 `app/dist/` 目录，随后可通过 Android 项目的构建流程打包为 APK。
+构建产物将输出到 `app/dist/` 目录。
 
 ---
 
 ## 构建 APK
 
-### 方式一：使用 apktool (推荐)
+### 方式一：Gradle 命令行（推荐）
+
 ```bash
 # 1. 构建前端
+cd app
 npm run build
 
-# 2. 替换 APK 中的 assets/www
-python3 scripts/update_apk.py
+# 2. 复制构建产物到 Android 项目
+rm -rf ../android-app/app/src/main/assets/www
+cp -r dist ../android-app/app/src/main/assets/www
 
-# 3. 输出签名后的 APK
-# /workspace/众合中医_signed.apk
+# 3. 构建 APK
+cd ../android-app
+./gradlew assembleRelease --no-daemon
 ```
 
+构建成功后，APK 位于：
+`android-app/app/build/outputs/apk/release/app-release.apk`
+
 ### 方式二：Android Studio
-1. 将 `app/dist/` 下的文件复制到 Android 项目的 `assets/www/` 目录
-2. 使用 Android Studio 构建并签名 APK
+1. 将 `app/dist/` 下的文件复制到 `android-app/app/src/main/assets/www/` 目录
+2. 使用 Android Studio 打开 `android-app/` 项目
+3. 配置签名密钥后构建并签名 APK
 
 ---
 
 ## 配置说明
 
-### Supabase 配置
-社区和用户功能依赖 Supabase，如需自行部署后端：
+### Supabase 配置（社区功能）
 
-1. 在 [Supabase](https://supabase.com) 创建项目
-2. 创建 `community_posts` 和 `community_comments` 表
-3. 在 `app/src/lib/supabase.ts` 中替换为你的 `SUPABASE_URL` 和 `SUPABASE_ANON_KEY`
+社区和用户功能依赖 Supabase。由于安全原因，`app/src/lib/supabase.ts` 已从仓库移除。
+
+如需启用社区功能：
+
+1. 复制模板文件：
+   ```bash
+   cp app/src/lib/supabase.ts.example app/src/lib/supabase.ts
+   ```
+
+2. 在 [Supabase](https://supabase.com) 创建项目
+
+3. 创建以下数据表：
+   - `community_posts`（社区帖子）
+   - `community_comments`（评论）
+   - `user_favorites`（收藏）
+   - `user_profiles`（用户资料）
+   - `app_updates`（热更新）
+
+4. 在 `app/src/lib/supabase.ts` 中替换为您的 `SUPABASE_URL` 和 `SUPABASE_ANON_KEY`
+
+### Android 签名配置
+
+由于安全原因，`android-app/app/build.gradle` 中的签名密码已清理。
+
+如需构建发布版 APK：
+
+1. 准备您的签名密钥（.keystore 或 .jks）
+2. 在 `android-app/app/build.gradle` 的 `signingConfigs.release` 中配置密钥路径和密码
+3. 或使用环境变量：
+   ```bash
+   export STORE_PASSWORD=your-store-password
+   export KEY_ALIAS=your-key-alias
+   export KEY_PASSWORD=your-key-password
+   ```
 
 ### Android 权限
+
 应用需要以下权限：
 - `INTERNET`：社区功能与 Supabase 通信
 - `READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE`：数据导入导出 (Android 9 及以下)
+
+---
+
+## 版本历史
+
+| 版本 | 说明 |
+|------|------|
+| v2.2.4 | 阅读字体改为微软雅黑，清理仓库敏感文件 |
+| v2.2.3 | 使用 SVG 矢量资源重建启动页 |
+| v2.2.2 | 替换应用图标，修复启动页布局 |
+| v2.2.1 | 更换启动页为中式塔楼样式 |
+| v2.2.0 | 重构为 Gradle 构建，模块化组件升级 |
 
 ---
 
