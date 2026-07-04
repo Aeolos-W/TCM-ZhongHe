@@ -329,7 +329,7 @@ export default function BookReader({ bookId, onBack, initialSearchQuery, initial
 
         {/* Content */}
         <div ref={contentRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-6 sm:px-8">
-          <div className="prose prose-sm max-w-none mx-auto" style={{ fontFamily: '"FangSong", "STFangSong", "仿宋", serif', lineHeight: '2.0' }}
+          <div className="prose prose-sm max-w-none mx-auto" style={{ fontFamily: '"Microsoft YaHei", "微软雅黑", "PingFang SC", sans-serif', lineHeight: '2.0' }}
             dangerouslySetInnerHTML={{ __html: renderedHtml }} />
         </div>
       </div>
