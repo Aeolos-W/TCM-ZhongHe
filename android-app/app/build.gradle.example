@@ -18,9 +18,9 @@ android {
         release {
             // TODO: 替换为您的签名密钥配置
             storeFile file('../your-key.keystore')
-            storePassword System.getenv('STORE_PASSWORD') ?: ''
-            keyAlias System.getenv('KEY_ALIAS') ?: ''
-            keyPassword System.getenv('KEY_PASSWORD') ?: ''
+            storePassword 'your-store-password'
+            keyAlias 'your-key-alias'
+            keyPassword 'your-key-password'
         }
     }
     buildTypes {

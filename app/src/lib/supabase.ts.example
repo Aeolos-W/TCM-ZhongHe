@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import type { CommunityPost, CommunityComment, AppUpdate, UserProfile } from '@/types/community';
 
-const SUPABASE_URL = 'https://rlgpgdivsxglzzjiduin.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZ3BnZGl2c3hnbHp6amlkdWluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjA0MDQsImV4cCI6MjA5ODEzNjQwNH0.Y5xhQWA5btDuGt86CS59Rj0LGMEeSLpVUpfuOJREmt4';
+// TODO: 替换为您的 Supabase 项目 URL 和匿名密钥
+const SUPABASE_URL = 'https://your-project-id.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-key-here';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { autoRefreshToken: true, persistSession: true },
@@ -44,7 +45,6 @@ export async function fetchPosts(type?: string): Promise<(CommunityPost & { comm
   const { data, error } = await q;
   if (error) throw error;
   const posts = (data || []) as CommunityPost[];
-  // 批量获取评论数
   if (posts.length > 0) {
     const postIds = posts.map((p) => p.id);
     const { data: counts, error: countError } = await supabase
@@ -100,7 +100,6 @@ export async function incrementViewCount(id: string): Promise<void> {
   try {
     await supabase.rpc('increment_post_view', { post_id: id });
   } catch {
-    // RPC 不存在时回退：读取当前值+1更新
     const { data } = await supabase.from('community_posts').select('view_count').eq('id', id).single();
     if (data) {
       await supabase.from('community_posts').update({ view_count: (data.view_count || 0) + 1 }).eq('id', id);
